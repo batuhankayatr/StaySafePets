@@ -37,6 +37,10 @@ const ReservationsSchema = new mongoose.Schema({
     },
     reservedBy : {
         type :mongoose.Schema.Types.ObjectId
+    },
+    name : {
+        type : String,
+        
     }
     
 },

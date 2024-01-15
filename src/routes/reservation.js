@@ -1,10 +1,11 @@
 const express = require('express');
 const Reservation = require('../models/Reservations');
 const router = express.Router();
-
+const Auth = require('../models/Auth.js');
 router.post('/reservation', async (req, res) => {
     try {
         const {  startDate, endDate, summary, address, price } = req.body;
+        const userId = req.body.userId;
 
         const parsedStartDate = new Date(startDate);
         const parsedEndDate = new Date(endDate);
@@ -26,7 +27,7 @@ router.post('/reservation', async (req, res) => {
         if (existingReservation) {
             return res.status(400).json({ success: false, error: 'Bu tarih aralığında başka bir rezervasyon bulunmaktadır.' });
         }
-v 
+
         // Tarih aralığındaki gün sayısını hesapla
         const startTimestamp = parsedStartDate.getTime();
         const endTimestamp = parsedEndDate.getTime();
@@ -34,9 +35,9 @@ v
         // Gün farkını hesaplayın
         const days = Math.ceil((endTimestamp - startTimestamp) / (1000 * 60 * 60 * 24));
         // Toplam ücreti hesapla (örneğin, her gün belirli bir fiyat ile çarpabilirsiniz)
-        console.log(days);
         const total = price * days;
-
+        const user = await Auth.findById(userId);
+        
         // Yeni rezervasyonu oluştur ve kaydet
         const newReservation = new Reservation({
             startDate,
@@ -45,7 +46,9 @@ v
             address,
             price,
             userId: req.body.userId,
-            total: total
+            total: total,
+            name : user.name
+            
         });
 
         const savedReservation = await newReservation.save();

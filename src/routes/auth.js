@@ -61,5 +61,42 @@ router.post('/login', async(req , res) =>{
     }
     }
 );
+// Kullanıcının şifresini güncelleyen endpoint
+router.post('/change-password', async (req, res) => {
+    try {
+        const { email, currentPassword, newPassword } = req.body;
+
+        const user = await Auth.findOne({ email });
+
+        if (!user) {
+            return res.status(404).json({ success: false, error: 'User not found' });
+        }
+
+        const isMatch = await bcrypt.compare(currentPassword, user.password);
+
+        if (!isMatch) {
+            return res.status(401).json({ success: false, error: 'Incorrect current password' });
+        }
+
+        if (newPassword.length < 6) {
+            return res.status(400).json({ success: false, error: 'New password must be at least 6 characters long' });
+        }
+
+        const newPasswordHash = await bcrypt.hash(newPassword, 12);
+        user.password = newPasswordHash;
+
+        await user.save();
+
+        
+        res.status(200).json({
+            success: true,
+            message: 'Password updated successfully',
+            
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, error: 'Internal Server Error' });
+    }
+});
 
 module.exports = router;

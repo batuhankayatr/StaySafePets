@@ -1,7 +1,8 @@
 const mongoose = require('mongoose')
 
+
 const ReservationsSchema = new mongoose.Schema({
-    userID : {
+    userId : {
         type : mongoose.Schema.Types.ObjectId,
         ref : 'Auth',
         required : true
@@ -30,6 +31,13 @@ const ReservationsSchema = new mongoose.Schema({
         type : String,
         required : true
     },
+    isReserved : {
+        type : Boolean,
+        default : false
+    },
+    reservedBy : {
+        type :mongoose.Schema.Types.ObjectId
+    }
     
 },
 {versionKey: false, toJSON: {
